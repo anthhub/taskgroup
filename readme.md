@@ -43,6 +43,8 @@ go get github.com/anthhub/taskgroup
 	// terminate all subtasks
 	defer g.Cancel()
 
+	// the loop need be wrapped by a goroutine when the limit less than your tasks count,
+	// else dead lock will be created.
 	go func() {
 		for i := 0; i < count; i++ {
 			g.Go(func() (interface{}, error) {
