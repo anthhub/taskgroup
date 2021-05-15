@@ -4,13 +4,12 @@ import (
 	"testing"
 )
 
-func BenchmarkTaskgroup(b *testing.B) {
+func BenchmarkTaskgroupWithLimit(b *testing.B) {
 	l := int(b.N / 10)
 	if l <= 0 {
 		l = 2
 	}
-	g := Create()
-	g.Limit(l)
+	g := New(&Option{Limit: uint32(l)})
 	defer g.Cancel()
 
 	b.StartTimer()
@@ -18,7 +17,7 @@ func BenchmarkTaskgroup(b *testing.B) {
 	go func() {
 		for i := 0; i < b.N; i++ {
 			g.Go(func() (interface{}, error) {
-				return consumer(0)
+				return delay(0)
 			})
 		}
 	}()
@@ -33,7 +32,7 @@ func BenchmarkTaskgroup(b *testing.B) {
 	b.StopTimer()
 }
 
-func BenchmarkChannel(b *testing.B) {
+func BenchmarkChannelWithLimit(b *testing.B) {
 	type carry struct {
 		Data int
 		Err  error
@@ -60,7 +59,7 @@ func BenchmarkChannel(b *testing.B) {
 					ch <- &carry{data, err}
 
 				}()
-				data, err = consumer(0)
+				data, err = delay(0)
 			}()
 		}
 	}()
@@ -75,15 +74,15 @@ func BenchmarkChannel(b *testing.B) {
 	b.StopTimer()
 }
 
-func BenchmarkTaskgroupWithoutLimit(b *testing.B) {
-	g := Create()
+func BenchmarkTaskgroup(b *testing.B) {
+	g := New()
 	defer g.Cancel()
 
 	b.StartTimer()
 	go func() {
 		for i := 0; i < b.N; i++ {
 			g.Go(func() (interface{}, error) {
-				return consumer(0)
+				return delay(0)
 			})
 		}
 	}()
@@ -98,7 +97,7 @@ func BenchmarkTaskgroupWithoutLimit(b *testing.B) {
 	b.StopTimer()
 }
 
-func BenchmarkChannelWithoutLimit(b *testing.B) {
+func BenchmarkChannel(b *testing.B) {
 	type carry struct {
 		Data int
 		Err  error
@@ -116,7 +115,7 @@ func BenchmarkChannelWithoutLimit(b *testing.B) {
 				defer func() {
 					ch <- &carry{data, err}
 				}()
-				data, err = consumer(0)
+				data, err = delay(0)
 			}()
 		}
 	}()
