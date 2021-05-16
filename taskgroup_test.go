@@ -205,7 +205,7 @@ func TestTimeout(t *testing.T) {
 	})
 }
 
-// taskgroup weak mode test
+// taskgroup one error test
 func TestError(t *testing.T) {
 
 	loop(func() {
@@ -294,7 +294,7 @@ func TestRandomCancel(t *testing.T) {
 	})
 }
 
-// taskgroup random cancel test
+// taskgroup provider and consumer mode example
 func TestProviderAndConsumer(t *testing.T) {
 
 	loop(func() {

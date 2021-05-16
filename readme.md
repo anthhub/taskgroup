@@ -21,7 +21,7 @@ go get github.com/anthhub/taskgroup
 	for i := 0; i < count; i++ {
 		g.Go(func() (interface{}, error) {
 			// your work function
-			return consumer()
+			return worker()
 		})
 	}
 
@@ -60,7 +60,7 @@ go get github.com/anthhub/taskgroup
 			g.Go(func() (interface{}, error) {
 				// your work function
 				// panic will be recover and return a error
-				return consumer(ctx)
+				return worker(ctx)
 			})
 		}
 
@@ -114,6 +114,7 @@ go get github.com/anthhub/taskgroup
 					return
 				default:
 					g.Go(func() (interface{}, error) {
+						// get group inner ctx
 						return worker(g.Ctx())
 					})
 				}
