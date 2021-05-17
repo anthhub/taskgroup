@@ -85,8 +85,8 @@ func WithContext(ctx context.Context, options ...*Option) (Group, context.Contex
 
 // It is to say the group is fulled, no more task will be sent, otherwise panic will occur!!!
 //
-// It is to tell the consumer that consuming the all tasks has sent, and then close itself.
-// 
+// It is to tell the consumer that consumes the all tasks has sent, and then close itself.
+//
 // It is very important that call the Fed method when you want to stop tasks producing of
 // the producer; it can terminate the consumer when all of the tasks are finished; otherwise
 // consumer will always wait for more tasks to consuming!!!
@@ -96,6 +96,7 @@ func (g *group) Fed() {
 	go func() {
 		// listening all of task finish
 		g.taskWg.Wait()
+		g.cancel()
 		g.close()
 	}()
 }

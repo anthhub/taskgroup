@@ -33,6 +33,7 @@ go get github.com/anthhub/taskgroup
 	if p := <-g.Result(); p.Err != nil {
 		return
 	}
+	// ...
 ```
 
 ## Advanced Usage
@@ -58,8 +59,8 @@ go get github.com/anthhub/taskgroup
 	go func() {
 		for i := 0; i < count; i++ {
 			g.Go(func() (interface{}, error) {
-				// your work function
-				// panic will be recover and return a error
+				// your work function that return data and error
+				// panic will be recover and just return a error
 				return worker(ctx)
 			})
 		}
@@ -83,6 +84,8 @@ go get github.com/anthhub/taskgroup
 			break
 		}
 		data := p.Data
+		// consume data from worker
+		consume(p.Data)
 		// ...
 	}
 	// ...
@@ -127,9 +130,14 @@ go get github.com/anthhub/taskgroup
 
 	func consumer(g Group) {	
 		go func() {	
-			for range g.Result() {	
+			for p := range g.Result() {	
 				// it is just consuming all message from provider till provider want to stop, so	
 				// g.Fed() is not necessary	
+				if p.Err != nil {
+					continue
+				}
+				// consume data from provider
+				consume(p.Data)
 			}	
 		}()
 	}

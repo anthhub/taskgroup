@@ -333,9 +333,12 @@ func provider() Group {
 
 func consumer(g Group) {
 	go func() {
-		for range g.Result() {
+		for p := range g.Result() {
 			// it is just consuming all message from provider till provider want to stop, so
 			// g.Fed() is not necessary
+			if p.Err != nil {
+				continue
+			}
 		}
 	}()
 }
