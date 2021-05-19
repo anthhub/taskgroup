@@ -25,12 +25,11 @@ go get github.com/anthhub/taskgroup
 		})
 	}
 
-	// declare the end of tasks producing
-	g.Fed()
-
-	// it will receive a message when a task of the group return an error or
+	// g.Fed() declare the end of tasks producing
+	// 
+	// g.Result() will receive a message when a task of the group return an error or
 	// till all tasks finish.
-	if p := <-g.Result(); p.Err != nil {
+	if p := <-g.Fed().Result(); p.Err != nil {
 		return
 	}
 	// ...

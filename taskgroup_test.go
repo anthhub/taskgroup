@@ -72,13 +72,13 @@ func TestBasic(t *testing.T) {
 			assert.Equal(t, sum1, sum)
 		}()
 
-		g, ctx := WithContext(context.Background(), &Option{Limit: 5})
+		g := New(&Option{Limit: 5})
 		defer g.Cancel()
 
 		for _, v := range arr {
 			v := v
 			g.Go(func() (interface{}, error) {
-				worker(ctx, v)
+				worker(g.Ctx(), v)
 
 				_, err := delay(v * v * 10)
 
@@ -211,7 +211,7 @@ func TestError(t *testing.T) {
 	loop(func() {
 
 		n := 100
-		g := New(&Option{MaxErrorCount: 1})
+		g := OneError()
 
 		for i := 0; i < n; i++ {
 			g.Go(func() (interface{}, error) {
@@ -238,7 +238,7 @@ func TestManualCancel(t *testing.T) {
 	loop(func() {
 		n := 100
 		mid := 50
-		g := New(&Option{MaxErrorCount: 1})
+		g := OneError()
 
 		for i := 0; i < n; i++ {
 			i := i

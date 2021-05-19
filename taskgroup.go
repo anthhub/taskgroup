@@ -57,7 +57,17 @@ type Group interface {
 	Result() <-chan *Payload
 	Ctx() context.Context
 	Go(f Fn)
-	Fed()
+	Fed() Group
+}
+
+// It just configures the MaxErrorCount of taskgroup to 1.
+func OneError(options ...*Option) Group {
+	if len(options) == 0 {
+		options = []*Option{{MaxErrorCount: 1}}
+	} else {
+		options[len(options)-1].MaxErrorCount = 1
+	}
+	return New(options...)
 }
 
 // It returns a new Group by options.
@@ -90,15 +100,16 @@ func WithContext(ctx context.Context, options ...*Option) (Group, context.Contex
 // It is very important that call the Fed method when you want to stop tasks producing of
 // the producer; it can terminate the consumer when all of the tasks are finished; otherwise
 // consumer will always wait for more tasks to consuming!!!
-func (g *group) Fed() {
+func (g *group) Fed() Group {
 	g.fulled = true
 
 	go func() {
 		// listening all of task finish
 		g.taskWg.Wait()
-		g.cancel()
 		g.close()
 	}()
+
+	return g
 }
 
 // It can gracefully cancel all tasks of the group.
